@@ -8,6 +8,7 @@ CREATE TABLE `user` (
   `uuid` binary(16) NOT NULL DEFAULT (UUID_TO_BIN(UUID())),
   `username` varchar(25) NOT NULL,
   `full_name` varchar(255) NULL,
+  `access_key` binary(32) NULL DEFAULT (random_bytes(32)),
   `role` enum('admin','customer') NOT NULL DEFAULT 'customer',
 	PRIMARY KEY(`uuid`)
 );
@@ -36,9 +37,9 @@ CREATE TABLE `customer_service` (
 
 CREATE TABLE `log` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `timestamp` timestamp NOT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `user_fk` binary(16) NULL,
   `message` varchar(255) NOT NULL,
 	PRIMARY KEY(`id`),
-  FOREIGN KEY (`user_fk`) REFERENCES `user` (`uuid`)
+  FOREIGN KEY (`user_fk`) REFERENCES `user` (`uuid`) ON DELETE SET NULL
 ) AUTO_INCREMENT=1;
