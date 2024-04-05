@@ -8,6 +8,7 @@ CREATE TABLE `user` (
   `uuid` binary(16) NOT NULL DEFAULT (UUID_TO_BIN(UUID())),
   `username` varchar(25) NOT NULL,
   `full_name` varchar(255) NULL,
+  `access_key` binary(32) NULL,
   `role` enum('admin','customer') NOT NULL DEFAULT 'customer',
 	PRIMARY KEY(`uuid`)
 );
