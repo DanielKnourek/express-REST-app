@@ -1,8 +1,8 @@
 import { getConnection } from '@/utils/db';
-import { customerSchema, type customer, type newCustomer } from '@/utils/customer/customer';
+import { customerSchema, type customer, type newCustomer } from '@/utils/customer/customerSchema';
 import { ResponseData } from '@/utils/index';
 import { z } from 'zod';
-import { randomUUID } from 'crypto';
+import { UUID, randomUUID } from 'crypto';
 
 const createCustomer = async (customer: newCustomer): Promise<ResponseData<customer>> => {
     const sql_querry = /*sql*/`INSERT INTO customer(uuid, display_name) VALUES (UUID_TO_BIN(?), ?)`;
@@ -36,8 +36,8 @@ const createCustomer = async (customer: newCustomer): Promise<ResponseData<custo
         })
 }
 
-const listCustomers = async (): Promise<ResponseData<customer[]>> => {
-    const sql_querry = /*sql*/`SELECT uuid, display_name FROM customer`;
+const listCustomer = async (): Promise<ResponseData<customer[]>> => {
+    const sql_querry = /*sql*/`SELECT BIN_TO_UUID(uuid) as uuid, display_name FROM customer`;
 
     return getConnection({
         message: 'Listing customers'
@@ -62,7 +62,37 @@ const listCustomers = async (): Promise<ResponseData<customer[]>> => {
         })
 }
 
+const deleteCustomer = async (uuid: string, caller?: UUID): Promise<ResponseData<void>> => {
+    const sql_querry = /*sql*/`DELETE FROM customer WHERE uuid = UUID_TO_BIN(?)`;
+
+    return getConnection({
+        message: `Deleting customer ${uuid}`,
+        user: caller
+    })
+        .then(connection => {
+            return connection.execute(sql_querry, [uuid])
+        })
+        .then(([rows]) => {
+            if ((rows as any).affectedRows != 1) {
+                throw new Error('Customer not deleted');
+            }
+        })
+        .then(result => {
+            return {
+                success: true,
+            } as ResponseData<void>
+        })
+        .catch(err => {
+            return {
+                success: false,
+                error: err.message
+            } as ResponseData<void>
+        })
+
+}
+
 export default {
-    createCustomer,
-    listCustomers,
+    create: createCustomer,
+    list: listCustomer,
+    delete: deleteCustomer,
 };
