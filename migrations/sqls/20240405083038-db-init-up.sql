@@ -36,7 +36,7 @@ CREATE TABLE `customer_service` (
 
 CREATE TABLE `log` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `timestamp` timestamp NOT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `user_fk` binary(16) NULL,
   `message` varchar(255) NOT NULL,
 	PRIMARY KEY(`id`),
