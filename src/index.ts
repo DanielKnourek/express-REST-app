@@ -1,4 +1,4 @@
-import express, { Express, Request, Response , Application } from 'express';
+import express, { Express, Request, Response, Application } from 'express';
 import dotenv from 'dotenv';
 import { registerApiRoutes } from '@/api/';
 
@@ -8,11 +8,11 @@ const app: Application = express();
 const port = process.env.PORT || 8000;
 
 app.get('/', (req: Request, res: Response) => {
-  res.send('Welcome to Express & TypeScript Server');
-//   customer.createCustomer({display_name: 'UK secret service'})
-//   .then((result) => {
-//     console.log("result", result);
-  // });
+
+  res.write('Welcome to Express & TypeScript Server\n');
+  res.write('This page is empty, for REST API please visit /api\n');
+  res.write('For more information, please visit https://github.com/DanielKnourek/express-REST-app');
+  res.status(200).end();
 });
 registerApiRoutes(app);
 

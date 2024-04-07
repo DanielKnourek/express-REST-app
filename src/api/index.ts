@@ -4,6 +4,10 @@ import user from '@/api/user';
 import user_lib from '@/utils/user';
 import { User, userBarerTokenSchema } from '@/utils/user/userSchema';
 
+/**
+ * Registers all API routes
+ * @param app express application
+ */
 const registerApiRoutes = (app: express.Application) => {
     const api = getSubrouter(app, '/api')
         .use(express.json())
