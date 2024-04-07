@@ -143,7 +143,9 @@ const getUserBy = async (identifier: UserBarerToken | { uuid: User['uuid'] }): P
  * @returns list of users if success=true, error message if success=false
  */
 const listUsersBy = async (customer_uuid: customer['uuid'], caller: User['uuid']): Promise<ResponseData<User[]>> => {
-    const sql_querry = /*sql*/`SELECT BIN_TO_UUID(user.uuid) as uuid, username, full_name, role
+    const sql_querry = /*sql*/`SELECT BIN_TO_UUID(user.uuid) as uuid,
+        HEX(access_token) as access_token,
+        username, full_name, role
         FROM user
         INNER JOIN customer_user ON user.uuid = customer_user.user_fk
         WHERE customer_user.customer_fk = UUID_TO_BIN(?)`;
