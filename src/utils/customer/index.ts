@@ -2,7 +2,8 @@ import { getConnection } from '@/utils/db';
 import { customerSchema, type customer, type newCustomer } from '@/utils/customer/customerSchema';
 import { ResponseData } from '@/utils/index';
 import { z } from 'zod';
-import { UUID, randomUUID } from 'crypto';
+import { randomUUID } from 'crypto';
+import { User } from '../user/userSchema';
 
 const createCustomer = async (customer_data: newCustomer): Promise<ResponseData<customer>> => {
     const sql_querry = /*sql*/`INSERT INTO customer(uuid, display_name) VALUES (UUID_TO_BIN(?), ?)`;
@@ -62,7 +63,7 @@ const listCustomer = async (): Promise<ResponseData<customer[]>> => {
         })
 }
 
-const deleteCustomer = async (uuid: string, caller?: UUID): Promise<ResponseData<void>> => {
+const deleteCustomer = async (uuid: string, caller?: User['uuid']): Promise<ResponseData<void>> => {
     const sql_querry = /*sql*/`DELETE FROM customer WHERE uuid = UUID_TO_BIN(?)`;
 
     return getConnection({

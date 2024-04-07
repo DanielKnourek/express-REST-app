@@ -1,13 +1,12 @@
-import { UUID } from "crypto";
 import mysql from "mysql2/promise";
-import { ResponseData } from "@/utils/index";
+import { User } from "@/utils/user/userSchema";
 
 type LogEntry = {
-    user?: UUID;
+    user?: User['uuid'];
     message: string;
 };
 
-let systemUser: UUID = '00000000-0000-0000-0000-000000000000';
+let systemUser: User['uuid'] = '00000000-0000-0000-0000-000000000000';
 
 const logMessage = (connection: mysql.PoolConnection, log: LogEntry) => {
     const sql_querry = /*sql*/`INSERT INTO log(user_fk, message) VALUES (uuid_to_bin(?), ?)`;
