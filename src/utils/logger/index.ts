@@ -1,25 +1,12 @@
 import mysql from "mysql2/promise";
 import { z } from "zod";
 
-import { User, userSchema } from "@/utils/user/userSchema";
-import { ResponseData } from ".";
-import { getConnection } from "./db";
+import { User } from "@/utils/user/userSchema";
+import { ResponseData } from "..";
+import { getConnection } from "../db";
+import { LogEntry, NewLogEntry, logEntrySchema, newLogEntrySchema, systemUser } from "./logSchema";
 
 
-const logEntrySchema = z.object({
-    id: z.number().nonnegative(),
-    timestamp: z.string().datetime(),
-    user_fk: userSchema.shape.uuid.optional(),
-    message: z.string().max(255),
-});
-
-const newLogEntrySchema = logEntrySchema.omit({ id: true, timestamp: true });
-
-type LogEntry = z.infer<typeof logEntrySchema>;
-type NewLogEntry = z.infer<typeof newLogEntrySchema>;
-
-
-let systemUser: User['uuid'] = '00000000-0000-0000-0000-000000000000';
 
 /**
  * inserts a new entry into the 'log' table
@@ -70,6 +57,7 @@ const listLogs = async (page: number, caller: User['uuid']): Promise<ResponseDat
 export {
     logEntrySchema, LogEntry,
     newLogEntrySchema, NewLogEntry,
+    systemUser,
     logMessage,
     listLogs
 };
