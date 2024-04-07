@@ -4,6 +4,7 @@ import user from '@/api/user';
 import user_lib from '@/utils/user';
 import { User, userBarerTokenSchema } from '@/utils/user/userSchema';
 import service from './service';
+import log from './log';
 
 /**
  * Registers all API routes
@@ -24,6 +25,7 @@ const registerApiRoutes = (app: express.Application) => {
     user.register(getSubrouter(customerRouter, '/:customer_uuid/user'));
     service.register(getSubrouter(customerRouter, '/:customer_uuid/service'));
 
+    log.register(getSubrouter(api, '/log'));
 };
 
 /**
