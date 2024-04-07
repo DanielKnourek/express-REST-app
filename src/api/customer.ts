@@ -28,11 +28,10 @@ const register = (Router: Router) => {
 
         Customer.list(req.caller.uuid)
             .then((result) => {
-                if (result.success) {
-                    res.send(result.result);
-                } else {
-                    res.status(500).send(result.error);
+                if (!result.success) {
+                    return res.status(500).send(result.error);
                 }
+                res.send(result.result);
             });
     });
 

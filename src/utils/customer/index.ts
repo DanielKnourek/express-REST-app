@@ -21,6 +21,7 @@ const createCustomer = async (customer_data: NewCustomer, caller?: User['uuid'])
     })
         .then((connection) => {
             return connection.execute(sql_querry, [uuid, customer_data.display_name])
+            .finally(() => connection.release())
         })
         .then(([rows]) => {
             if ((rows as any).affectedRows != 1) { // TODO: cast to any
@@ -58,6 +59,7 @@ const listCustomer = async (caller?: User['uuid']): Promise<ResponseData<Custome
     })
         .then(connection => {
             return connection.execute(sql_querry)
+            .finally(() => connection.release())
         })
         .then(([rows]) => {
             return z.array(customerSchema).parseAsync(rows)
@@ -91,6 +93,7 @@ const deleteCustomer = async (uuid: string, caller?: User['uuid']): Promise<Resp
     })
         .then(connection => {
             return connection.execute(sql_querry, [uuid])
+            .finally(() => connection.release())
         })
         .then(([rows]) => {
             if ((rows as any).affectedRows != 1) {
