@@ -14,7 +14,7 @@ import { randomUUID } from 'crypto';
 const createService = (service: NewService, caller: User['uuid']): Promise<ResponseData<Service>> => {
     const sql_querry = /*sql*/`INSERT INTO 
         service(uuid, display_name)
-        VALUES (UUID_TO_BIN(?) ?)`;
+        VALUES (UUID_TO_BIN(?), ?)`;
     
     const uuid = randomUUID();
 
