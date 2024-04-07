@@ -1,11 +1,12 @@
 import z from 'zod';
+import { Roles } from '@/utils/authorization';
 
 const userSchema = z.object({
     uuid: z.string().uuid(),
     username: z.string().max(25),
     full_name: z.string().max(255),
     access_token: z.string().length(64).optional(),
-    role: z.enum(['admin', 'customer']),
+    role: z.nativeEnum(Roles),
 });
 
 const newUserSchema = userSchema.omit({ uuid: true, access_token: true });

@@ -4,6 +4,7 @@ import user from "@/utils/user";
 import { User, newUserSchema, userBarerTokenSchema, userSchema } from "@/utils/user/userSchema";
 import { Router } from "express";
 import { z } from "zod";
+import { Rules, checkACL } from "@/utils/authorization";
 
 const register = (Router: Router) => {
     /**
@@ -14,15 +15,8 @@ const register = (Router: Router) => {
      * @param access_token header bearer token for authentication
      */
     Router.get('/', async (req, res) => {
-        const req_caller = userBarerTokenSchema.safeParse(req.headers); //TODO: add as middleware
-        if (!req_caller.success) {
+        if (req.caller === undefined) {
             res.status(400).send('Missing access token');
-            return;
-        }
-
-        const caller = await user.getBy({ access_token: req_caller.data.access_token })
-        if (!caller.success) {
-            res.status(401).send('Could not authenticate user');
             return;
         }
 
@@ -33,7 +27,15 @@ const register = (Router: Router) => {
             return res.status(400).send('Invalid customer uuid parameter in URL');
         }
 
-        user.listBy(req_params.data.customer_uuid, caller.result.uuid)
+        const authorized = await checkACL({
+            rule: Rules.isMember,
+            args: [req_params.data.customer_uuid]
+        }, req.caller)
+        if (!authorized) {
+            return res.status(403).send('Unauthorized');
+        }
+
+        user.listBy(req_params.data.customer_uuid, req.caller.uuid)
             .then((result) => {
                 res.send(result);
             })
@@ -50,8 +52,7 @@ const register = (Router: Router) => {
      * @param body {newUser} object
      */
     Router.post('/', async (req, res) => {
-        const req_caller = userBarerTokenSchema.safeParse(req.headers); //TODO: add as middleware
-        if (!req_caller.success) {
+        if (req.caller === undefined) {
             res.status(400).send('Missing access token');
             return;
         }
@@ -69,14 +70,15 @@ const register = (Router: Router) => {
             return res.status(400).send('Invalid customer uuid parameter in URL');
         }
 
-
-        const caller = await user.getBy({ access_token: req_caller.data.access_token })
-        if (!caller.success) {
-            res.status(401).send('Could not authenticate user');
-            return;
+        const authorized = await checkACL({
+            rule: Rules.isMember,
+            args: [req_params.data.customer_uuid]
+        }, req.caller)
+        if (!authorized) {
+            return res.status(403).send('Unauthorized');
         }
 
-        const create_result = await user.create(user_data.data, caller.result.uuid)
+        const create_result = await user.create(user_data.data, req.caller.uuid)
             .then((result) => {
                 return result;
             })
@@ -92,7 +94,7 @@ const register = (Router: Router) => {
         }
 
         const add_to_customer_result = await user.addToCustomer(
-            req_params.data.customer_uuid, create_result.result.uuid, caller.result.uuid)
+            req_params.data.customer_uuid, create_result.result.uuid, req.caller.uuid)
             .then((result) => {
                 return result;
             })
@@ -119,8 +121,7 @@ const register = (Router: Router) => {
      * @param access_token header bearer token for authentication
      */
     Router.delete('/:user_uuid', async (req, res) => {
-        const req_caller = userBarerTokenSchema.safeParse(req.headers); //TODO: add as middleware
-        if (!req_caller.success) {
+        if (req.caller === undefined) {
             res.status(400).send('Missing access token');
             return;
         }
@@ -133,13 +134,15 @@ const register = (Router: Router) => {
             return res.status(400).send('Invalid user uuid parameter in URL');
         }
 
-        const caller = await user.getBy({ access_token: req_caller.data.access_token })
-        if (!caller.success) {
-            res.status(401).send('Could not authenticate user');
-            return;
+        const authorized = await checkACL({
+            rule: Rules.isMember,
+            args: [req_params.data.customer_uuid]
+        }, req.caller)
+        if (!authorized) {
+            return res.status(403).send('Unauthorized');
         }
 
-        user.delete(req_params.data.user_uuid, caller.result.uuid)
+        user.delete(req_params.data.user_uuid, req.caller.uuid)
             .then((result) => {
                 if (!result.success) {
                     res.status(500).send(result.error);

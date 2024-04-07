@@ -1,10 +1,13 @@
 import express from 'express';
 import customer from '@/api/customer';
 import user from '@/api/user';
+import user_lib from '@/utils/user';
+import { User, userBarerTokenSchema } from '@/utils/user/userSchema';
 
 const registerApiRoutes = (app: express.Application) => {
     const api = getSubrouter(app, '/api')
-        .use(express.json());
+        .use(express.json())
+        .use(require_access_token);
 
     api.get('/', (req, res) => {
         res.send('Welcome to the API');
@@ -22,5 +25,29 @@ const getSubrouter = (app: express.Router, path: string) => {
     app.use(path, subrouter);
     return subrouter;
 }
+
+declare global {
+    namespace Express {
+        interface Request {
+            caller?: User;
+        }
+    }
+}
+const require_access_token: express.RequestHandler = async (req, res, next) => {
+    const req_caller = userBarerTokenSchema.safeParse(req.headers);
+    if (!req_caller.success) {
+        res.status(400).send('Missing or invalid access token');
+        return;
+    }
+
+    const caller = await user_lib.getBy({ access_token: req_caller.data.access_token })
+    if (!caller.success) {
+        res.status(401).send('Could find user while authenticating');
+        return;
+    }
+
+    req.caller = caller.result;
+    next();
+    }
 
 export { registerApiRoutes };
