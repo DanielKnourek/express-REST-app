@@ -15,7 +15,7 @@ import { LogEntry, NewLogEntry, logEntrySchema, newLogEntrySchema, systemUser } 
  */
 const logMessage = (connection: mysql.PoolConnection, log: NewLogEntry) => {
     const sql_querry = /*sql*/`INSERT INTO log(user_fk, message) VALUES (uuid_to_bin(?), ?)`;
-    connection.execute(sql_querry, [log.user_fk || systemUser, log.message]);
+    connection.execute(sql_querry, [log.caller || systemUser, log.message]);
     connection.release();
 }
 
