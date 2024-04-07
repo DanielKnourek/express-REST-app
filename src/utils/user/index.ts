@@ -151,7 +151,7 @@ const listUsersBy = async (customer_uuid: Customer['uuid'], caller: User['uuid']
         WHERE customer_user.customer_fk = UUID_TO_BIN(?)`;
 
     return getConnection({
-        message: 'Listing users in customer {${customer_uuid}}',
+        message: `Listing users in customer {${customer_uuid}}`,
         user: caller,
     })
         .then((connection) => {

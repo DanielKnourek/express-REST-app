@@ -90,7 +90,7 @@ const isMemberRule = async (user: User, customer_uuid: Customer['uuid']): Promis
         ) as is_member`;
 
     return await getConnection({
-        message: 'Testing if user {${user.uuid}} is a member of customer {${customer_uuid}}',
+        message: `Testing if user {${user.uuid}} is a member of customer {${customer_uuid}}`,
     })
         .then((connection) => {
             return connection.execute(sql_querry, [customer_uuid, user.uuid])
