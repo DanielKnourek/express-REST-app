@@ -20,7 +20,7 @@ const createUser = async (user_data: NewUser, caller: User['uuid']): Promise<Res
 
     return getConnection({
         message: `Creating user {${user_data.username} with uuid: {${uuid}}`,
-        user: caller
+        caller
     })
         .then((connection) => {
             return connection.execute(sql_querry, [
@@ -29,7 +29,7 @@ const createUser = async (user_data: NewUser, caller: User['uuid']): Promise<Res
                 user_data.full_name,
                 user_data.role
             ])
-            .finally(() => connection.release())
+                .finally(() => connection.release())
         })
         .then(([rows]) => {
             if ((rows as any).affectedRows != 1) { // TODO: cast to any
@@ -67,11 +67,11 @@ const addUserToCustomer = async (customer_uuid: Customer['uuid'], user_uuid: Use
 
     return getConnection({
         message: `Adding user {${user_uuid}} to customer {${customer_uuid}}`,
-        user: caller,
+        caller,
     })
         .then((connection) => {
             return connection.execute(sql_querry, [customer_uuid, user_uuid])
-            .finally(() => connection.release())
+                .finally(() => connection.release())
         })
         .then(([rows]) => {
             if ((rows as any).affectedRows != 1) { // TODO: cast to any
@@ -120,7 +120,7 @@ const getUserBy = async (identifier: UserBarerToken | { uuid: User['uuid'] }): P
     })
         .then((connection) => {
             return connection.execute(sql_querry, [querry_args])
-            .finally(() => connection.release())
+                .finally(() => connection.release())
         })
         .then(([rows]) => {
             return z.array(userSchema).parseAsync(rows)
@@ -155,11 +155,11 @@ const listUsersBy = async (customer_uuid: Customer['uuid'], caller: User['uuid']
 
     return getConnection({
         message: `Listing users in customer {${customer_uuid}}`,
-        user: caller,
+        caller,
     })
         .then((connection) => {
             return connection.execute(sql_querry, [customer_uuid])
-            .finally(() => connection.release())
+                .finally(() => connection.release())
         })
         .then(([rows]) => {
             return z.array(userSchema).parseAsync(rows)
@@ -190,11 +190,11 @@ const deleteUser = async (user_uuid: User['uuid'], caller: User['uuid']): Promis
 
     return getConnection({
         message: `Deleting user {${user_uuid}}`,
-        user: caller,
+        caller,
     })
         .then((connection) => {
             return connection.execute(sql_querry, [user_uuid])
-            .finally(() => connection.release())
+                .finally(() => connection.release())
         })
         .then(([rows]) => {
             if ((rows as any).affectedRows != 1) { // TODO: cast to any

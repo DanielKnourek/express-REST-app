@@ -15,16 +15,16 @@ const createService = (service: NewService, caller: User['uuid']): Promise<Respo
     const sql_querry = /*sql*/`INSERT INTO 
         service(uuid, display_name)
         VALUES (UUID_TO_BIN(?), ?)`;
-    
+
     const uuid = randomUUID();
 
     return getConnection({
         message: `Creating service {${service.display_name}} with uuid: {${uuid}}`,
-        user: caller,
+        caller,
     })
         .then((connection) => {
             return connection.execute(sql_querry, [uuid, service.display_name])
-            .finally(() => connection.release())
+                .finally(() => connection.release())
         })
         .then(([rows]) => {
             if ((rows as any).affectedRows != 1) { // TODO: cast to any
@@ -62,11 +62,11 @@ const addServiceToCustomer = (customer_uuid: string, service_uuid: string, calle
 
     return getConnection({
         message: `Adding service {${service_uuid}} to customer {${customer_uuid}}`,
-        user: caller,
+        caller,
     })
         .then((connection) => {
             return connection.execute(sql_querry, [customer_uuid, service_uuid])
-            .finally(() => connection.release())
+                .finally(() => connection.release())
         })
         .then(([rows]) => {
             if ((rows as any).affectedRows != 1) { // TODO: cast to any
@@ -102,11 +102,11 @@ const listServiciesBy = (customer_uuid: string, caller: User['uuid']): Promise<R
 
     return getConnection({
         message: `Listing services for customer {${customer_uuid}}`,
-        user: caller,
+        caller,
     })
         .then((connection) => {
             return connection.execute(sql_querry, [customer_uuid])
-            .finally(() => connection.release())
+                .finally(() => connection.release())
         })
         .then(([rows]) => {
             return z.array(serviceSchema).parse(rows)
@@ -136,11 +136,11 @@ const deleteService = (service_uuid: string, caller: User['uuid']): Promise<Resp
 
     return getConnection({
         message: `Deleting service {${service_uuid}}`,
-        user: caller,
+        caller,
     })
         .then((connection) => {
             return connection.execute(sql_querry, [service_uuid])
-            .finally(() => connection.release())
+                .finally(() => connection.release())
         })
         .then(([rows]) => {
             if ((rows as any).affectedRows != 1) { // TODO: cast to any

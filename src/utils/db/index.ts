@@ -1,5 +1,5 @@
 import mysql from 'mysql2/promise';
-import {LogEntry, logMessage} from '@/utils/logger';
+import {NewLogEntry, logMessage} from '@/utils/logger';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -21,7 +21,7 @@ const db_pool = mysql.createPool({
  * @param message 
  * @returns Promise<mysql.PoolConnection>
  */
-const getConnection = async (message: LogEntry) => {
+const getConnection = async (message: NewLogEntry) => {
     return db_pool.getConnection().then(connection => {
         logMessage(connection, message);
         return connection;
