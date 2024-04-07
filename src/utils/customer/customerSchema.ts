@@ -7,10 +7,10 @@ const customerSchema = z.object({
 
 const newCustomerSchema = customerSchema.omit({uuid: true});
 
-type customer = z.infer<typeof customerSchema>;
-type newCustomer = z.infer<typeof newCustomerSchema>;
+type Customer = z.infer<typeof customerSchema>;
+type NewCustomer = z.infer<typeof newCustomerSchema>;
 
 export {
-    customerSchema, customer,
-    newCustomerSchema, newCustomer,
+    customerSchema, Customer,
+    newCustomerSchema, NewCustomer,
 };

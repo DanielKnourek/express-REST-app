@@ -1,16 +1,23 @@
 import { getConnection } from '@/utils/db';
-import { customerSchema, type customer, type newCustomer } from '@/utils/customer/customerSchema';
+import { customerSchema, type Customer, type NewCustomer } from '@/utils/customer/customerSchema';
 import { ResponseData } from '@/utils/index';
 import { z } from 'zod';
 import { randomUUID } from 'crypto';
 import { User } from '../user/userSchema';
 
-const createCustomer = async (customer_data: newCustomer): Promise<ResponseData<customer>> => {
+/**
+ * Obtains a connection to database and inserts a new row into 'customer' table.
+ * @param customer_data values for the new customer
+ * @param caller uuid of the user making the request for logEntry
+ * @returns inserted customer data if success=true, error message if success=false
+ */
+const createCustomer = async (customer_data: NewCustomer, caller?: User['uuid']): Promise<ResponseData<Customer>> => {
     const sql_querry = /*sql*/`INSERT INTO customer(uuid, display_name) VALUES (UUID_TO_BIN(?), ?)`;
     const uuid = randomUUID();
 
     return getConnection({
-        message: `Creating customer {${customer_data.display_name} and uuid: {${uuid}}`
+        message: `Creating customer {${customer_data.display_name} and uuid: {${uuid}}`,
+        user: caller,
     })
         .then((connection) => {
             return connection.execute(sql_querry, [uuid, customer_data.display_name])
@@ -27,21 +34,27 @@ const createCustomer = async (customer_data: newCustomer): Promise<ResponseData<
                     uuid: uuid,
                     display_name: customer_data.display_name,
                 }
-            } as ResponseData<customer>
+            } as ResponseData<Customer>
         })
         .catch((err) => {
             return {
                 success: false,
                 error: err.message
-            } as ResponseData<customer>
+            } as ResponseData<Customer>
         })
 }
 
-const listCustomer = async (): Promise<ResponseData<customer[]>> => {
+/**
+ * Obtains a connection to database and lists all customers in 'customer' table.
+ * @param caller uuid of the user making the request for logEntry
+ * @returns list of customers if success=true, error message if success=false
+ */
+const listCustomer = async (caller?: User['uuid']): Promise<ResponseData<Customer[]>> => {
     const sql_querry = /*sql*/`SELECT BIN_TO_UUID(uuid) as uuid, display_name FROM customer`;
 
     return getConnection({
-        message: 'Listing customers'
+        message: 'Listing customers',
+        user: caller,
     })
         .then(connection => {
             return connection.execute(sql_querry)
@@ -53,16 +66,22 @@ const listCustomer = async (): Promise<ResponseData<customer[]>> => {
             return {
                 success: true,
                 result
-            } as ResponseData<customer[]>
+            } as ResponseData<Customer[]>
         })
         .catch(err => {
             return {
                 success: false,
                 error: err.message
-            } as ResponseData<customer[]>
+            } as ResponseData<Customer[]>
         })
 }
 
+/**
+ * Obtains a connection to database and deletes a row from 'customer' table.
+ * @param uuid uuid of the customer to be deleted
+ * @param caller uuid of the user making the request for logEntry
+ * @returns success=true or error message if success=false
+ */
 const deleteCustomer = async (uuid: string, caller?: User['uuid']): Promise<ResponseData<void>> => {
     const sql_querry = /*sql*/`DELETE FROM customer WHERE uuid = UUID_TO_BIN(?)`;
 
