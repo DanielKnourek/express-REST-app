@@ -3,7 +3,7 @@ import { userSchema, type User, type NewUser, UserBarerToken } from '@/utils/use
 import { ResponseData } from '@/utils/index';
 import { z } from 'zod';
 import { randomUUID } from 'crypto';
-import { customer } from '../customer/customerSchema';
+import { Customer } from '../customer/customerSchema';
 
 /**
  * Obtains a connection to database and inserts a new user into 'user' table.
@@ -59,7 +59,7 @@ const createUser = async (user_data: NewUser, caller: User['uuid']): Promise<Res
  * @param caller uuid of the user making the request for logEntry
  * @returns success=true or error message if success=false
  */
-const addUserToCustomer = async (customer_uuid: customer['uuid'], user_uuid: User['uuid'], caller: User['uuid']): Promise<ResponseData<void>> => {
+const addUserToCustomer = async (customer_uuid: Customer['uuid'], user_uuid: User['uuid'], caller: User['uuid']): Promise<ResponseData<void>> => {
     const sql_querry = /*sql*/`INSERT INTO 
         customer_user(customer_fk, user_fk)
         VALUES (UUID_TO_BIN(?), UUID_TO_BIN(?))`;
@@ -142,7 +142,7 @@ const getUserBy = async (identifier: UserBarerToken | { uuid: User['uuid'] }): P
  * @param caller uuid of the user making the request for logEntry
  * @returns list of users if success=true, error message if success=false
  */
-const listUsersBy = async (customer_uuid: customer['uuid'], caller: User['uuid']): Promise<ResponseData<User[]>> => {
+const listUsersBy = async (customer_uuid: Customer['uuid'], caller: User['uuid']): Promise<ResponseData<User[]>> => {
     const sql_querry = /*sql*/`SELECT BIN_TO_UUID(user.uuid) as uuid,
         HEX(access_token) as access_token,
         username, full_name, role

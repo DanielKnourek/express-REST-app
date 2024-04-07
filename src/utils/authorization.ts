@@ -1,5 +1,5 @@
 import { User } from "@/utils/user/userSchema";
-import { customer } from "./customer/customerSchema";
+import { Customer } from "./customer/customerSchema";
 import { getConnection } from "./db";
 
 /**
@@ -79,7 +79,7 @@ const checkACL = async (defined_rule: ruleDefinitionType, user: User): Promise<b
     return false;
 }
 
-const isMemberRule = async (user: User, customer_uuid: customer['uuid']): Promise<boolean> => {
+const isMemberRule = async (user: User, customer_uuid: Customer['uuid']): Promise<boolean> => {
     const sql_querry = /*sql*/`SELECT EXISTS(
         SELECT *
         FROM customer_user 
