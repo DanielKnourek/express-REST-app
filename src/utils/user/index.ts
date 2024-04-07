@@ -5,6 +5,12 @@ import { z } from 'zod';
 import { randomUUID } from 'crypto';
 import { customer } from '../customer/customerSchema';
 
+/**
+ * Obtains a connection to database and inserts a new user into 'user' table.
+ * @param user_data values for the new user
+ * @param caller uuid of the user making the request for logEntry
+ * @returns inserted user data if success=true, error message if success=false
+ */
 const createUser = async (user_data: NewUser, caller: User['uuid']): Promise<ResponseData<User>> => {
     const sql_querry = /*sql*/`INSERT INTO 
         user(uuid, username, full_name, role) 
@@ -46,6 +52,13 @@ const createUser = async (user_data: NewUser, caller: User['uuid']): Promise<Res
         })
 }
 
+/**
+ * Obtains a connection to database and inserts a new row into 'customer_user' table.
+ * @param customer_uuid uuid of the customer to which the user is added
+ * @param user_uuid specifies the user to be added to the customer
+ * @param caller uuid of the user making the request for logEntry
+ * @returns success=true or error message if success=false
+ */
 const addUserToCustomer = async (customer_uuid: customer['uuid'], user_uuid: User['uuid'], caller: User['uuid']): Promise<ResponseData<void>> => {
     const sql_querry = /*sql*/`INSERT INTO 
         customer_user(customer_fk, user_fk)
@@ -76,6 +89,11 @@ const addUserToCustomer = async (customer_uuid: customer['uuid'], user_uuid: Use
         })
 }
 
+/**
+ * gives full user data by either 'uuid' or 'access_token'
+ * @param identifier user 'access_token' or 'uuid'
+ * @returns user data if success=true, error message if success=false
+ */
 const getUserBy = async (identifier: UserBarerToken | { uuid: User['uuid'] }): Promise<ResponseData<User>> => {
     const sql_querry_uuid = /*sql*/`SELECT BIN_TO_UUID(uuid) as uuid, username, full_name, role, HEX(access_token) as access_token
         FROM user
@@ -118,8 +136,13 @@ const getUserBy = async (identifier: UserBarerToken | { uuid: User['uuid'] }): P
         })
 }
 
+/**
+ * lists all users in a customer
+ * @param customer_uuid uuid of the customer
+ * @param caller uuid of the user making the request for logEntry
+ * @returns list of users if success=true, error message if success=false
+ */
 const listUsersBy = async (customer_uuid: customer['uuid'], caller: User['uuid']): Promise<ResponseData<User[]>> => {
-    //selct only users that are in the customer
     const sql_querry = /*sql*/`SELECT BIN_TO_UUID(user.uuid) as uuid, username, full_name, role
         FROM user
         INNER JOIN customer_user ON user.uuid = customer_user.user_fk
@@ -149,6 +172,12 @@ const listUsersBy = async (customer_uuid: customer['uuid'], caller: User['uuid']
         })
 }
 
+/**
+ * deletes user with user_uuid from 'user' table
+ * @param user_uuid user to be deleted
+ * @param caller uuid of the user making the request for logEntry
+ * @returns success=true or error message if success=false
+ */
 const deleteUser = async (user_uuid: User['uuid'], caller: User['uuid']): Promise<ResponseData<void>> => {
     const sql_querry = /*sql*/`DELETE FROM user
         WHERE uuid = UUID_TO_BIN(?)`;

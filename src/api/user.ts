@@ -6,6 +6,13 @@ import { Router } from "express";
 import { z } from "zod";
 
 const register = (Router: Router) => {
+    /**
+     * @method GET 
+     * @path /customer/:customer_uuid/user
+     * list all users for a customer
+     * @param customer_uuid uuid of the customer
+     * @param access_token header bearer token for authentication
+     */
     Router.get('/', async (req, res) => {
         const req_caller = userBarerTokenSchema.safeParse(req.headers); //TODO: add as middleware
         if (!req_caller.success) {
@@ -35,6 +42,13 @@ const register = (Router: Router) => {
             });
     });
 
+    /**
+     * @method POST
+     * @path /customer/:customer_uuid/user
+     * create a new user for a customer
+     * @param customer_uuid uuid of the customer
+     * @param body {newUser} object
+     */
     Router.post('/', async (req, res) => {
         const req_caller = userBarerTokenSchema.safeParse(req.headers); //TODO: add as middleware
         if (!req_caller.success) {
@@ -96,6 +110,14 @@ const register = (Router: Router) => {
         res.status(201).send(create_result.result);
     });
 
+    /**
+     * @method DELETE
+     * @path /customer/:customer_uuid/user/:user_uuid
+     * delete a user for a customer
+     * @param customer_uuid uuid of the customer
+     * @param user_uuid uuid of the user
+     * @param access_token header bearer token for authentication
+     */
     Router.delete('/:user_uuid', async (req, res) => {
         const req_caller = userBarerTokenSchema.safeParse(req.headers); //TODO: add as middleware
         if (!req_caller.success) {

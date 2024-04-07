@@ -14,6 +14,13 @@ const db_pool = mysql.createPool({
     queueLimit: 0
 });
 
+/**
+ * Obtains a connection to the database
+ * 
+ * Before obtaining the connection, calls function logMessage.
+ * @param message 
+ * @returns Promise<mysql.PoolConnection>
+ */
 const getConnection = async (message: LogEntry) => {
     return db_pool.getConnection().then(connection => {
         logMessage(connection, message);
