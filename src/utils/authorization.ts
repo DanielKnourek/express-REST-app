@@ -2,9 +2,25 @@ import { User } from "@/utils/user/userSchema";
 import { customer } from "./customer/customerSchema";
 import { getConnection } from "./db";
 
+/**
+ * Rules for authorization
+ */
 enum Rules {
+    /**
+     * Rule for admin
+     * if user has role admin, rule passes
+     */
     isAdmin = 'isAdmin',
+    /**
+     * Rule for member
+     * if user is a member of a customer, rule passes
+     * args: customer_uuid - must be provided in args
+     */
     isMember = 'isMember',
+    /**
+     * Rule for user
+     * if user has role customer, rule passes
+     */
     isUser = 'isUser',
 }
 
@@ -18,13 +34,24 @@ const ruleTable: {
 } = {
     [Rules.isAdmin]: [Rules.isAdmin],
     [Rules.isMember]: [Rules.isAdmin, Rules.isMember],
-    [Rules.isUser]: [Rules.isAdmin, Rules.isMember, Rules.isUser],
+    [Rules.isUser]: [Rules.isAdmin, Rules.isUser],
 }
 
 type ruleDefinitionType = {
     rule: Rules,
     args?: any[],
 }
+
+/**
+ * For specified rule, check if user has permission or higher equivalent
+ * @param defined_rule rule to check and arguments for specific rule
+ * @param user tested user
+ * @returns true if user has permission, false otherwise 
+ * @description user has role customer, rule is isMember. First is selected ruleTable for isMeber rule, 
+ * which is [isAdmin, isMember]. Then for each rule in table, check if user has permission. 
+ * User does not have role admin, so isAdmin rule is false, then moves to next rule, isMember.
+ * in args is uuid of customer, so check is made if user is member of customer.
+ */
 const checkACL = async (defined_rule: ruleDefinitionType, user: User): Promise<boolean> => {
     const ruleset = ruleTable[defined_rule.rule];
 

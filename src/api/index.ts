@@ -20,6 +20,12 @@ const registerApiRoutes = (app: express.Application) => {
 
 };
 
+/**
+ * provides subrouter for a given path and router
+ * @param app root router
+ * @param path path for subrouter
+ * @returns router with path "${router.path}${path}"
+ */
 const getSubrouter = (app: express.Router, path: string) => {
     const subrouter = express.Router({mergeParams: true});
     app.use(path, subrouter);
@@ -33,6 +39,11 @@ declare global {
         }
     }
 }
+
+/**
+ * middleware for parsing and matching access_token to a user,
+ * then user data are added to request object
+ */
 const require_access_token: express.RequestHandler = async (req, res, next) => {
     const req_caller = userBarerTokenSchema.safeParse(req.headers);
     if (!req_caller.success) {
