@@ -37,7 +37,10 @@ const register = (Router: Router) => {
 
         user.listBy(req_params.data.customer_uuid, req.caller.uuid)
             .then((result) => {
-                res.send(result);
+                if (!result.success) {
+                    return res.status(500).send(result.error);
+                }
+                res.send(result.result);
             })
             .catch((err) => {
                 res.status(500).send(err.message);
