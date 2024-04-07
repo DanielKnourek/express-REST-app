@@ -31,7 +31,7 @@ const listLogs = async (page: number, caller: User['uuid']): Promise<ResponseDat
 
     return getConnection({
         message: `Listing all logs`,
-        user_fk: caller,
+        caller,
     })
         .then((connection) => {
             return connection.execute(sql_querry, [`${page_size}`, `${page * page_size}`])

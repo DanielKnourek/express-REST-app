@@ -4,7 +4,7 @@ import { User, userSchema } from "../user/userSchema";
 const logEntrySchema = z.object({
     id: z.number().nonnegative(),
     timestamp: z.date(),
-    user_fk: userSchema.shape.uuid.optional(),
+    caller: userSchema.shape.uuid.optional(),
     message: z.string().max(255),
 });
 

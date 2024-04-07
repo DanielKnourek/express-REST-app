@@ -20,7 +20,7 @@ const createService = (service: NewService, caller: User['uuid']): Promise<Respo
 
     return getConnection({
         message: `Creating service {${service.display_name}} with uuid: {${uuid}}`,
-        user_fk: caller,
+        caller,
     })
         .then((connection) => {
             return connection.execute(sql_querry, [uuid, service.display_name])
@@ -62,7 +62,7 @@ const addServiceToCustomer = (customer_uuid: string, service_uuid: string, calle
 
     return getConnection({
         message: `Adding service {${service_uuid}} to customer {${customer_uuid}}`,
-        user_fk: caller,
+        caller,
     })
         .then((connection) => {
             return connection.execute(sql_querry, [customer_uuid, service_uuid])
@@ -102,7 +102,7 @@ const listServiciesBy = (customer_uuid: string, caller: User['uuid']): Promise<R
 
     return getConnection({
         message: `Listing services for customer {${customer_uuid}}`,
-        user_fk: caller,
+        caller,
     })
         .then((connection) => {
             return connection.execute(sql_querry, [customer_uuid])
@@ -136,7 +136,7 @@ const deleteService = (service_uuid: string, caller: User['uuid']): Promise<Resp
 
     return getConnection({
         message: `Deleting service {${service_uuid}}`,
-        user_fk: caller,
+        caller,
     })
         .then((connection) => {
             return connection.execute(sql_querry, [service_uuid])

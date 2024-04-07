@@ -17,7 +17,7 @@ const createCustomer = async (customer_data: NewCustomer, caller?: User['uuid'])
 
     return getConnection({
         message: `Creating customer {${customer_data.display_name} and uuid: {${uuid}}`,
-        user_fk: caller,
+        caller,
     })
         .then((connection) => {
             return connection.execute(sql_querry, [uuid, customer_data.display_name])
@@ -55,7 +55,7 @@ const listCustomer = async (caller?: User['uuid']): Promise<ResponseData<Custome
 
     return getConnection({
         message: 'Listing customers',
-        user_fk: caller,
+        caller,
     })
         .then(connection => {
             return connection.execute(sql_querry)
@@ -89,7 +89,7 @@ const deleteCustomer = async (uuid: string, caller?: User['uuid']): Promise<Resp
 
     return getConnection({
         message: `Deleting customer ${uuid}`,
-        user_fk: caller
+        caller
     })
         .then(connection => {
             return connection.execute(sql_querry, [uuid])
