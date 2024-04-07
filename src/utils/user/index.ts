@@ -29,6 +29,7 @@ const createUser = async (user_data: NewUser, caller: User['uuid']): Promise<Res
                 user_data.full_name,
                 user_data.role
             ])
+            .finally(() => connection.release())
         })
         .then(([rows]) => {
             if ((rows as any).affectedRows != 1) { // TODO: cast to any
@@ -70,6 +71,7 @@ const addUserToCustomer = async (customer_uuid: Customer['uuid'], user_uuid: Use
     })
         .then((connection) => {
             return connection.execute(sql_querry, [customer_uuid, user_uuid])
+            .finally(() => connection.release())
         })
         .then(([rows]) => {
             if ((rows as any).affectedRows != 1) { // TODO: cast to any
@@ -118,6 +120,7 @@ const getUserBy = async (identifier: UserBarerToken | { uuid: User['uuid'] }): P
     })
         .then((connection) => {
             return connection.execute(sql_querry, [querry_args])
+            .finally(() => connection.release())
         })
         .then(([rows]) => {
             return z.array(userSchema).parseAsync(rows)
@@ -156,6 +159,7 @@ const listUsersBy = async (customer_uuid: Customer['uuid'], caller: User['uuid']
     })
         .then((connection) => {
             return connection.execute(sql_querry, [customer_uuid])
+            .finally(() => connection.release())
         })
         .then(([rows]) => {
             return z.array(userSchema).parseAsync(rows)
@@ -190,6 +194,7 @@ const deleteUser = async (user_uuid: User['uuid'], caller: User['uuid']): Promis
     })
         .then((connection) => {
             return connection.execute(sql_querry, [user_uuid])
+            .finally(() => connection.release())
         })
         .then(([rows]) => {
             if ((rows as any).affectedRows != 1) { // TODO: cast to any

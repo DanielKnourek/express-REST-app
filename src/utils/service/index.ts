@@ -24,6 +24,7 @@ const createService = (service: NewService, caller: User['uuid']): Promise<Respo
     })
         .then((connection) => {
             return connection.execute(sql_querry, [uuid, service.display_name])
+            .finally(() => connection.release())
         })
         .then(([rows]) => {
             if ((rows as any).affectedRows != 1) { // TODO: cast to any
@@ -65,6 +66,7 @@ const addServiceToCustomer = (customer_uuid: string, service_uuid: string, calle
     })
         .then((connection) => {
             return connection.execute(sql_querry, [customer_uuid, service_uuid])
+            .finally(() => connection.release())
         })
         .then(([rows]) => {
             if ((rows as any).affectedRows != 1) { // TODO: cast to any
@@ -104,6 +106,7 @@ const listServiciesBy = (customer_uuid: string, caller: User['uuid']): Promise<R
     })
         .then((connection) => {
             return connection.execute(sql_querry, [customer_uuid])
+            .finally(() => connection.release())
         })
         .then(([rows]) => {
             return z.array(serviceSchema).parse(rows)
@@ -137,6 +140,7 @@ const deleteService = (service_uuid: string, caller: User['uuid']): Promise<Resp
     })
         .then((connection) => {
             return connection.execute(sql_querry, [service_uuid])
+            .finally(() => connection.release())
         })
         .then(([rows]) => {
             if ((rows as any).affectedRows != 1) { // TODO: cast to any

@@ -94,6 +94,7 @@ const isMemberRule = async (user: User, customer_uuid: Customer['uuid']): Promis
     })
         .then((connection) => {
             return connection.execute(sql_querry, [customer_uuid, user.uuid])
+            .finally(() => connection.release())
         })
         .then(([rows]) => {
             if ((rows as any)[0].is_member != 1) { // TODO: cast to any
