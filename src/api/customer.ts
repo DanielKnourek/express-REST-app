@@ -56,9 +56,13 @@ const register = (Router: Router) => {
             return res.status(403).send('Unauthorized');
         }
 
-        const customer = newCustomerSchema.parse(req.body);
+        const customer = newCustomerSchema.safeParse(req.body);
+        if (!customer.success) {
+            res.status(400).send(`Invalid data for new customer ${customer.error}`);
+            return;
+        }
         
-        Customer.create(customer, req.caller.uuid)
+        Customer.create(customer.data, req.caller.uuid)
         .then((result) => {
             if (result.success) {
                 res.send(result.result);
